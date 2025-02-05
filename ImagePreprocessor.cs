@@ -10,7 +10,7 @@ public class ImagePreprocessor
         _random = new Random();
     }
 
-    public Bitmap GrayScale(Image original)
+    public Bitmap GrayScale(Bitmap original)
     {
         Bitmap grayscaleImage = new Bitmap(original.Width, original.Height);
 
@@ -28,7 +28,7 @@ public class ImagePreprocessor
         return grayscaleImage;
     }
 
-    public Bitmap AdjustContrast(Image original, float value)
+    public Bitmap AdjustContrast(Bitmap original, float value)
     {
         value = (100.0f + value) / 100.0f;
         value *= value;
@@ -41,47 +41,71 @@ public class ImagePreprocessor
 
         int height = newBitmap.Height;
         int width = newBitmap.Width;
+        int stride = data.Stride;
 
         unsafe
         {
-            for (int y = 0; y < height; ++y)
-            {
-                byte* row = (byte*)data.Scan0 + (y * data.Stride);
-                int columnOffset = 0;
+            byte* ptr = (byte*)data.Scan0;
 
-                for (int x = 0; x < width; ++x)
+            Parallel.For(0, height, y =>
+            {
+                byte* row = ptr + (y * stride);
+                for (int x = 0; x < width; x++)
                 {
+                    int columnOffset = x * 4;
+
                     byte B = row[columnOffset];
                     byte G = row[columnOffset + 1];
                     byte R = row[columnOffset + 2];
 
-                    float Red = R / 255.0f;
-                    float Green = G / 255.0f;
-                    float Blue = B / 255.0f;
-                    Red = (((Red - 0.5f) * value) + 0.5f) * 255.0f;
-                    Green = (((Green - 0.5f) * value) + 0.5f) * 255.0f;
-                    Blue = (((Blue - 0.5f) * value) + 0.5f) * 255.0f;
+                    float red = R / 255.0f;
+                    float green = G / 255.0f;
+                    float blue = B / 255.0f;
 
-                    int iR = (int)Red;
-                    iR = iR > 255 ? 255 : iR;
-                    iR = iR < 0 ? 0 : iR;
-                    int iG = (int)Green;
-                    iG = iG > 255 ? 255 : iG;
-                    iG = iG < 0 ? 0 : iG;
-                    int iB = (int)Blue;
-                    iB = iB > 255 ? 255 : iB;
-                    iB = iB < 0 ? 0 : iB;
+                    red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
+                    green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
+                    blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
 
-                    row[columnOffset] = (byte)iB;
-                    row[columnOffset + 1] = (byte)iG;
-                    row[columnOffset + 2] = (byte)iR;
-
-                    columnOffset += 4;
+                    row[columnOffset] = (byte)Math.Clamp(blue, 0, 255);
+                    row[columnOffset + 1] = (byte)Math.Clamp(green, 0, 255);
+                    row[columnOffset + 2] = (byte)Math.Clamp(red, 0, 255);
                 }
-            }
+            });
         }
 
         newBitmap.UnlockBits(data);
+        return newBitmap;
+    }
+
+    public Bitmap AdjustContrast_v2(Bitmap original, float value) // slower than AdjustContrast but understandable
+    {
+        value = (100f + value) / 100f;
+        value *= value;
+
+        Bitmap newBitmap = (Bitmap)original.Clone();
+
+        for (int y = 0; y < original.Height; y++)
+        {
+            for (int x = 0; x < original.Width; x++)
+            {
+                Color pixelColor = original.GetPixel(x, y);
+
+                float red = pixelColor.R / 255.0f;
+                float green = pixelColor.G / 255.0f;
+                float blue = pixelColor.B / 255.0f;
+
+                red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
+                green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
+                blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
+
+                int iR = (int)Math.Clamp(red, 0, 255);
+                int iG = (int)Math.Clamp(green, 0, 255);
+                int iB = (int)Math.Clamp(blue, 0, 255);
+
+                newBitmap.SetPixel(x, y, Color.FromArgb(iR, iG, iB));
+            }
+        };
+
         return newBitmap;
     }
 

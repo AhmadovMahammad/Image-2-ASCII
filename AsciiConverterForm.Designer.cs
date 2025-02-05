@@ -20,156 +20,270 @@ namespace Image2ASCII
 
         private void InitializeComponent()
         {
-            this.menuStrip = new MenuStrip();
-            this.fileMenu = new ToolStripMenuItem();
-            this.openMenuItem = new ToolStripMenuItem();
-            this.separator = new ToolStripSeparator();
-            this.exitMenuItem = new ToolStripMenuItem();
-
-            this.mainPanel = new Panel();
-            this.imagePanel = new Panel();
-            this.pictureBox = new PictureBox();
-            this.uploadButton = new Button();
-
-            this.settingsPanel = new Panel();
-            this.settingLabel = new Label();
-            this.settingTrackBar = new TrackBar();
-            this.settingValueLabel = new Label();
-
-            this.buttonPanel = new Panel();
-            this.copyButton = new Button();
-            this.saveButton = new Button();
-            this.resetButton = new Button();
-
-            this.outputPanel = new Panel();
-            this.outputTextBox = new RichTextBox();
-
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.settingTrackBar)).BeginInit();
-            this.SuspendLayout();
-
-            // MenuStrip
-            this.menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu });
-            this.menuStrip.Location = new Point(0, 0);
-            this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new Size(_size.width, 30);
-            this.menuStrip.TabIndex = 0;
-
-            // File Menu
-            this.fileMenu.DropDownItems.AddRange(new ToolStripItem[] { openMenuItem, separator, exitMenuItem });
-            this.fileMenu.Name = "fileMenu";
-            this.fileMenu.Size = new Size(46, 24);
-            this.fileMenu.Text = "&File";
-
-            // Open Menu Item
-            this.openMenuItem.Name = "openMenuItem";
-            this.openMenuItem.Size = new Size(150, 26);
-            this.openMenuItem.Text = "&Open ...";
-
-            // Separator
-            this.separator.Name = "separator";
-            this.separator.Size = new Size(147, 6);
-
-            // Exit Menu Item
-            this.exitMenuItem.Name = "exitMenuItem";
-            this.exitMenuItem.Size = new Size(150, 26);
-            this.exitMenuItem.Text = "E&xit";
-
-            // Main Panel
-            this.mainPanel.Dock = DockStyle.Fill;
-            this.mainPanel.Controls.Add(this.imagePanel);
-            this.mainPanel.Controls.Add(this.settingsPanel);
-            this.mainPanel.Controls.Add(this.buttonPanel);
-            this.mainPanel.Controls.Add(this.outputPanel);
-
-            // Image Panel (Left 30%)
-            this.imagePanel.Location = new Point(10, 40);
-            this.imagePanel.Size = new Size(350, 300);
-            this.imagePanel.Controls.Add(this.pictureBox);
-            this.imagePanel.Controls.Add(this.uploadButton);
-
-            // PictureBox
-            this.pictureBox.Location = new Point(0, 10);
-            this.pictureBox.Size = new Size(300, 250);
-            this.pictureBox.BorderStyle = BorderStyle.FixedSingle;
-            this.pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-
-            // Upload Button
-            this.uploadButton.Location = new Point(0, 270);
-            this.uploadButton.Size = new Size(300, 30);
-            this.uploadButton.Text = "Upload Image";
-            this.uploadButton.Click += new EventHandler(this.openToolStripMenuItem_Click);
-
-            // Settings Panel (Right 70%)
-            this.settingsPanel.Location = new Point(370, 40);
-            this.settingsPanel.Size = new Size(800, 300);
-            this.settingsPanel.Controls.Add(this.settingLabel);
-            this.settingsPanel.Controls.Add(this.settingTrackBar);
-            this.settingsPanel.Controls.Add(this.settingValueLabel);
-
-            // Setting Label
-            this.settingLabel.Location = new Point(20, 20);
-            this.settingLabel.Size = new Size(120, 30);
-            this.settingLabel.Text = "Brightness:";
-
-            // Setting TrackBar
-            this.settingTrackBar.Location = new Point(150, 20);
-            this.settingTrackBar.Size = new Size(500, 30);
-            this.settingTrackBar.Minimum = 0;
-            this.settingTrackBar.Maximum = 100;
-
-            // Setting Value Label
-            this.settingValueLabel.Location = new Point(670, 20);
-            this.settingValueLabel.Size = new Size(50, 30);
-            this.settingValueLabel.Text = "50%";
-
-            // Button Panel (Middle)
-            this.buttonPanel.Location = new Point(10, 360);
-            this.buttonPanel.Size = new Size(1160, 50);
-            this.buttonPanel.Controls.Add(this.copyButton);
-            this.buttonPanel.Controls.Add(this.saveButton);
-            this.buttonPanel.Controls.Add(this.resetButton);
-
-            // Copy Button
-            this.copyButton.Location = new Point(0, 10);
-            this.copyButton.Size = new Size(200, 30);
-            this.copyButton.Text = "Copy to Clipboard";
-
-            // Save Button
-            this.saveButton.Location = new Point(210, 10);
-            this.saveButton.Size = new Size(200, 30);
-            this.saveButton.Text = "Save ASCII Art";
-
-            // Reset Button
-            this.resetButton.Location = new Point(420, 10);
-            this.resetButton.Size = new Size(200, 30);
-            this.resetButton.Text = "Reset Filters";
-
-            // Output Panel (Bottom)
-            this.outputPanel.Location = new Point(10, 420);
-            this.outputPanel.Size = new Size(1160, 250);
-            this.outputPanel.Controls.Add(this.outputTextBox);
-
-            // Output TextBox
-            this.outputTextBox.Dock = DockStyle.Fill;
-            this.outputTextBox.ReadOnly = true;
-            this.outputTextBox.WordWrap = true;
-
-            // Form Configuration
-            this.Controls.Add(menuStrip);
-            this.Controls.Add(this.mainPanel);
-
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.ClientSize = new Size(1200, 700);
-            this.MaximizeBox = false;
-            this.AutoScroll = true;
-            this.Font = new Font("FiraCode Nerd Font Mono Med", 8.25f);
-            this.Text = "ASCII Art Generator";
-
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.settingTrackBar)).EndInit();
-            this.ResumeLayout(false);
+            menuStrip = new MenuStrip();
+            fileMenu = new ToolStripMenuItem();
+            openMenuItem = new ToolStripMenuItem();
+            separator = new ToolStripSeparator();
+            exitMenuItem = new ToolStripMenuItem();
+            mainPanel = new Panel();
+            imagePanel = new Panel();
+            pictureBox = new PictureBox();
+            uploadButton = new Button();
+            settingsPanel = new Panel();
+            settingLabel_1 = new Label();
+            settingTrackBar_1 = new TrackBar();
+            settingValueLabel_1 = new Label();
+            settingLabel_2 = new Label();
+            settingTrackBar_2 = new TrackBar();
+            settingValueLabel_2 = new Label();
+            buttonPanel = new Panel();
+            copyButton = new Button();
+            saveAsciiArtButton = new Button();
+            saveAsPngButton = new Button();
+            resetButton = new Button();
+            outputPanel = new Panel();
+            outputTextBox = new RichTextBox();
+            menuStrip.SuspendLayout();
+            mainPanel.SuspendLayout();
+            imagePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
+            settingsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)settingTrackBar_1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)settingTrackBar_2).BeginInit();
+            buttonPanel.SuspendLayout();
+            outputPanel.SuspendLayout();
+            SuspendLayout();
+            // 
+            // menuStrip
+            // 
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu });
+            menuStrip.Location = new Point(5, 0);
+            menuStrip.Name = "menuStrip";
+            menuStrip.Size = new Size(1195, 24);
+            menuStrip.TabIndex = 0;
+            // 
+            // fileMenu
+            // 
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { openMenuItem, separator, exitMenuItem });
+            fileMenu.Name = "fileMenu";
+            fileMenu.Size = new Size(37, 20);
+            fileMenu.Text = "&File";
+            // 
+            // openMenuItem
+            // 
+            openMenuItem.Name = "openMenuItem";
+            openMenuItem.Size = new Size(115, 22);
+            openMenuItem.Text = "&Open ...";
+            // 
+            // separator
+            // 
+            separator.Name = "separator";
+            separator.Size = new Size(112, 6);
+            // 
+            // exitMenuItem
+            // 
+            exitMenuItem.Name = "exitMenuItem";
+            exitMenuItem.Size = new Size(115, 22);
+            exitMenuItem.Text = "E&xit";
+            // 
+            // mainPanel
+            // 
+            mainPanel.Controls.Add(imagePanel);
+            mainPanel.Controls.Add(settingsPanel);
+            mainPanel.Controls.Add(buttonPanel);
+            mainPanel.Controls.Add(outputPanel);
+            mainPanel.Dock = DockStyle.Fill;
+            mainPanel.Location = new Point(5, 0);
+            mainPanel.Name = "mainPanel";
+            mainPanel.Size = new Size(1195, 700);
+            mainPanel.TabIndex = 1;
+            // 
+            // imagePanel
+            // 
+            imagePanel.Controls.Add(pictureBox);
+            imagePanel.Controls.Add(uploadButton);
+            imagePanel.Location = new Point(10, 40);
+            imagePanel.Name = "imagePanel";
+            imagePanel.Size = new Size(350, 300);
+            imagePanel.TabIndex = 0;
+            // 
+            // pictureBox
+            // 
+            pictureBox.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox.Location = new Point(3, 3);
+            pictureBox.Name = "pictureBox";
+            pictureBox.Size = new Size(300, 250);
+            pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox.TabIndex = 0;
+            pictureBox.TabStop = false;
+            // 
+            // uploadButton
+            // 
+            uploadButton.Location = new Point(3, 263);
+            uploadButton.Name = "uploadButton";
+            uploadButton.Size = new Size(300, 30);
+            uploadButton.TabIndex = 1;
+            uploadButton.Text = "Upload Image";
+            uploadButton.Click += openToolStripMenuItem_Click;
+            // 
+            // settingsPanel
+            // 
+            settingsPanel.Controls.Add(settingLabel_1);
+            settingsPanel.Controls.Add(settingTrackBar_1);
+            settingsPanel.Controls.Add(settingValueLabel_1);
+            settingsPanel.Controls.Add(settingLabel_2);
+            settingsPanel.Controls.Add(settingTrackBar_2);
+            settingsPanel.Controls.Add(settingValueLabel_2);
+            settingsPanel.Location = new Point(370, 40);
+            settingsPanel.Name = "settingsPanel";
+            settingsPanel.Size = new Size(800, 300);
+            settingsPanel.TabIndex = 1;
+            // 
+            // settingLabel_1
+            // 
+            settingLabel_1.Location = new Point(20, 20);
+            settingLabel_1.Name = "settingLabel_1";
+            settingLabel_1.Size = new Size(120, 30);
+            settingLabel_1.TabIndex = 0;
+            settingLabel_1.Text = "Contrast:";
+            settingLabel_1.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // settingTrackBar_1
+            // 
+            settingTrackBar_1.Location = new Point(150, 20);
+            settingTrackBar_1.Maximum = 100;
+            settingTrackBar_1.Minimum = -100;
+            settingTrackBar_1.Name = "settingTrackBar_1";
+            settingTrackBar_1.Size = new Size(500, 45);
+            settingTrackBar_1.TabIndex = 1;
+            settingTrackBar_1.TickFrequency = 5;
+            settingTrackBar_1.TickStyle = TickStyle.TopLeft;
+            settingTrackBar_1.Scroll += brightnessTrackBar_Scroll;
+            // 
+            // settingValueLabel_1
+            // 
+            settingValueLabel_1.Location = new Point(670, 20);
+            settingValueLabel_1.Name = "settingValueLabel_1";
+            settingValueLabel_1.Size = new Size(120, 30);
+            settingValueLabel_1.TabIndex = 2;
+            settingValueLabel_1.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // settingLabel_2
+            // 
+            settingLabel_2.Location = new Point(20, 60);
+            settingLabel_2.Name = "settingLabel_2";
+            settingLabel_2.Size = new Size(120, 30);
+            settingLabel_2.TabIndex = 0;
+            settingLabel_2.Text = "Gray Scale:";
+            settingLabel_2.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // settingTrackBar_2
+            // 
+            settingTrackBar_2.Location = new Point(150, 60);
+            settingTrackBar_2.Maximum = 100;
+            settingTrackBar_2.Name = "settingTrackBar_2";
+            settingTrackBar_2.Size = new Size(500, 45);
+            settingTrackBar_2.TabIndex = 1;
+            settingTrackBar_2.TickFrequency = 5;
+            settingTrackBar_2.TickStyle = TickStyle.TopLeft;
+            settingTrackBar_2.Scroll += grayScaleTrackBar_Scroll;
+            // 
+            // settingValueLabel_2
+            // 
+            settingValueLabel_2.Location = new Point(670, 60);
+            settingValueLabel_2.Name = "settingValueLabel_2";
+            settingValueLabel_2.Size = new Size(120, 30);
+            settingValueLabel_2.TabIndex = 2;
+            settingValueLabel_2.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // buttonPanel
+            // 
+            buttonPanel.Controls.Add(copyButton);
+            buttonPanel.Controls.Add(saveAsciiArtButton);
+            buttonPanel.Controls.Add(saveAsPngButton);
+            buttonPanel.Controls.Add(resetButton);
+            buttonPanel.Location = new Point(10, 360);
+            buttonPanel.Name = "buttonPanel";
+            buttonPanel.Size = new Size(1160, 50);
+            buttonPanel.TabIndex = 2;
+            // 
+            // copyButton
+            // 
+            copyButton.Location = new Point(0, 10);
+            copyButton.Name = "copyButton";
+            copyButton.Size = new Size(200, 30);
+            copyButton.TabIndex = 0;
+            copyButton.Text = "Copy to Clipboard";
+            // 
+            // saveAsciiArtButton
+            // 
+            saveAsciiArtButton.Location = new Point(210, 10);
+            saveAsciiArtButton.Name = "saveAsciiArtButton";
+            saveAsciiArtButton.Size = new Size(200, 30);
+            saveAsciiArtButton.TabIndex = 1;
+            saveAsciiArtButton.Text = "Save ASCII Art";
+            // 
+            // saveAsPngButton
+            // 
+            saveAsPngButton.Location = new Point(420, 10);
+            saveAsPngButton.Name = "saveAsPngButton";
+            saveAsPngButton.Size = new Size(200, 30);
+            saveAsPngButton.TabIndex = 1;
+            saveAsPngButton.Text = "Save as PNG";
+            // 
+            // resetButton
+            // 
+            resetButton.Location = new Point(630, 10);
+            resetButton.Name = "resetButton";
+            resetButton.Size = new Size(200, 30);
+            resetButton.TabIndex = 2;
+            resetButton.Text = "Reset Filters";
+            resetButton.Click += resetButton_Click;
+            // 
+            // outputPanel
+            // 
+            outputPanel.Controls.Add(outputTextBox);
+            outputPanel.Location = new Point(10, 420);
+            outputPanel.Name = "outputPanel";
+            outputPanel.Size = new Size(1160, 250);
+            outputPanel.TabIndex = 3;
+            // 
+            // outputTextBox
+            // 
+            outputTextBox.Dock = DockStyle.Fill;
+            outputTextBox.Location = new Point(0, 0);
+            outputTextBox.Name = "outputTextBox";
+            outputTextBox.ReadOnly = true;
+            outputTextBox.Size = new Size(1160, 250);
+            outputTextBox.TabIndex = 0;
+            outputTextBox.Text = "";
+            // 
+            // AsciiConverterForm
+            // 
+            AutoScroll = true;
+            ClientSize = new Size(1200, 700);
+            Controls.Add(menuStrip);
+            Controls.Add(mainPanel);
+            Font = new Font("FiraCode Nerd Font Mono Med", 8.25F);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            Name = "AsciiConverterForm";
+            Padding = new Padding(5, 0, 0, 0);
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "ASCII Art Generator";
+            menuStrip.ResumeLayout(false);
+            menuStrip.PerformLayout();
+            mainPanel.ResumeLayout(false);
+            imagePanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
+            settingsPanel.ResumeLayout(false);
+            settingsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)settingTrackBar_1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)settingTrackBar_2).EndInit();
+            buttonPanel.ResumeLayout(false);
+            outputPanel.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -184,12 +298,19 @@ namespace Image2ASCII
         private PictureBox pictureBox;
         private Button uploadButton;
         private Panel settingsPanel;
-        private Label settingLabel;
-        private TrackBar settingTrackBar;
-        private Label settingValueLabel;
+
+        private Label settingLabel_1;
+        private TrackBar settingTrackBar_1;
+        private Label settingValueLabel_1;
+
+        private Label settingLabel_2;
+        private TrackBar settingTrackBar_2;
+        private Label settingValueLabel_2;
+
         private Panel buttonPanel;
         private Button copyButton;
-        private Button saveButton;
+        private Button saveAsciiArtButton;
+        private Button saveAsPngButton;
         private Button resetButton;
         private Panel outputPanel;
         private RichTextBox outputTextBox;
