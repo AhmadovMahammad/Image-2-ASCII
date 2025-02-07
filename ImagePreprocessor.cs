@@ -1,161 +1,168 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Text;
 
 namespace Image2ASCII;
-public class ImagePreprocessor
+public partial class ImagePreprocessor
 {
-    private readonly Random _random;
+    private readonly List<WeightedChar> _weightedChars;
+    private SizeF _commonSize = new SizeF(10, 10);
 
     public ImagePreprocessor()
     {
-        _random = new Random();
+        _weightedChars = GenerateFontWeights();
+        _weightedChars = [.. _weightedChars.OrderBy(m => m.Weight)];
     }
 
-    public Bitmap GrayScale(Bitmap original)
+    public SizeF CommonSize
     {
-        Bitmap grayscaleImage = new Bitmap(original.Width, original.Height);
-
-        for (int y = 0; y < original.Height; y++)
-        {
-            for (int x = 0; x < original.Width; x++)
-            {
-                Color pixelColor = ((Bitmap)original).GetPixel(x, y);
-                int grayValue = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
-
-                grayscaleImage.SetPixel(x, y, Color.FromArgb(grayValue, grayValue, grayValue));
-            }
-        }
-
-        return grayscaleImage;
+        get => _commonSize;
+        set => _commonSize = value;
     }
 
-    public Bitmap AdjustContrast(Bitmap original, float value)
+    public List<WeightedChar> GenerateFontWeights()
     {
-        value = (100.0f + value) / 100.0f;
-        value *= value;
+        List<WeightedChar> weightedChars = [];
+        CommonSize = GetCharacterSize();
 
-        Bitmap newBitmap = (Bitmap)original.Clone();
-        BitmapData data = newBitmap.LockBits(
-            new Rectangle(0, 0, newBitmap.Width, newBitmap.Height),
-            ImageLockMode.ReadWrite,
-            newBitmap.PixelFormat);
-
-        int height = newBitmap.Height;
-        int width = newBitmap.Width;
-        int stride = data.Stride;
-
-        unsafe
+        //for (int i = 32; i <= 126; i++)
+        foreach (char c in new char[] { '@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.', '\'' })
         {
-            byte* ptr = (byte*)data.Scan0;
-
-            Parallel.For(0, height, y =>
+            //char c = (char)i;
+            if (!char.IsControl(c))
             {
-                byte* row = ptr + (y * stride);
-                for (int x = 0; x < width; x++)
+                double weight = GetWeight(c, CommonSize);
+                weightedChars.Add(new WeightedChar
                 {
-                    int columnOffset = x * 4;
-
-                    byte B = row[columnOffset];
-                    byte G = row[columnOffset + 1];
-                    byte R = row[columnOffset + 2];
-
-                    float red = R / 255.0f;
-                    float green = G / 255.0f;
-                    float blue = B / 255.0f;
-
-                    red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
-                    green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
-                    blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
-
-                    row[columnOffset] = (byte)Math.Clamp(blue, 0, 255);
-                    row[columnOffset + 1] = (byte)Math.Clamp(green, 0, 255);
-                    row[columnOffset + 2] = (byte)Math.Clamp(red, 0, 255);
-                }
-            });
-        }
-
-        newBitmap.UnlockBits(data);
-        return newBitmap;
-    }
-
-    public Bitmap AdjustContrast_v2(Bitmap original, float value) // slower than AdjustContrast but understandable
-    {
-        value = (100f + value) / 100f;
-        value *= value;
-
-        Bitmap newBitmap = (Bitmap)original.Clone();
-
-        for (int y = 0; y < original.Height; y++)
-        {
-            for (int x = 0; x < original.Width; x++)
-            {
-                Color pixelColor = original.GetPixel(x, y);
-
-                float red = pixelColor.R / 255.0f;
-                float green = pixelColor.G / 255.0f;
-                float blue = pixelColor.B / 255.0f;
-
-                red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
-                green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
-                blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
-
-                int iR = (int)Math.Clamp(red, 0, 255);
-                int iG = (int)Math.Clamp(green, 0, 255);
-                int iB = (int)Math.Clamp(blue, 0, 255);
-
-                newBitmap.SetPixel(x, y, Color.FromArgb(iR, iG, iB));
+                    Character = c.ToString(),
+                    Weight = weight
+                });
             }
-        };
-
-        return newBitmap;
-    }
-
-    private SizeF GetGeneralSize()
-    {
-        SizeF generalsize = new SizeF(0, 0);
-
-        for (int i = 32; i <= 126; i++) // ASCII characters from space to ~ (tilde), including only printable characters
-        {
-            char c = Convert.ToChar(i);
-
-            // Create a dummy bitmap just to get a graphics object
-            Image img = new Bitmap(1, 1);
-            Graphics drawing = Graphics.FromImage(img);
-
-            SizeF textSize = drawing.MeasureString(c.ToString(), SystemFonts.DefaultFont);
-
-            // Update, if necessary, the max width and height
-            if (textSize.Width > generalsize.Width) generalsize.Width = textSize.Width;
-            if (textSize.Height > generalsize.Height) generalsize.Height = textSize.Height;
-
-            // free all resources
-            img.Dispose();
-            drawing.Dispose();
         }
 
-        generalsize.Width = (int)generalsize.Width;
-        generalsize.Height = (int)generalsize.Height;
+        return weightedChars;
+    }
+
+    public SizeF GetCharacterSize()
+    {
+        SizeF commonSize = new SizeF(0, 0);
+
+        // ASCII printable characters
+        for (int i = 32; i <= 126; i++)
+        {
+            char c = (char)i;
+
+            // create a dummy image just to get a graphic object, so we can use its measure method.
+            using Image img = new Bitmap(1, 1);
+            using Graphics graphics = Graphics.FromImage(img);
+
+            SizeF characterSize = graphics.MeasureString(c.ToString(), Constants.Font);
+
+            if (characterSize.Width > commonSize.Width) commonSize.Width = characterSize.Width;
+            if (characterSize.Height > commonSize.Height) commonSize.Height = characterSize.Height;
+        }
+
+        commonSize.Width = (int)commonSize.Width;
+        commonSize.Height = (int)commonSize.Height;
 
         // and that size defines a square to maintain image proportions
-        if (generalsize.Width > generalsize.Height) generalsize.Height = generalsize.Width;
-        else generalsize.Width = generalsize.Height;
+        if (commonSize.Width > commonSize.Height) commonSize.Height = commonSize.Width;
+        else commonSize.Width = commonSize.Height;
 
-        return generalsize;
+        return commonSize;
     }
 
-    // for testing purposes
-    public Bitmap CreateRandomImage(int width, int height)
+    private double GetWeight(char c, SizeF size)
     {
-        Bitmap image = new Bitmap(width, height);
+        Bitmap charImage = DrawText(c.ToString(), Color.Black, Color.White, size);
 
-        for (int y = 0; y < image.Height; y++)
+        double totalSum = 0;
+        for (int y = 0; y < charImage.Height; y++)
         {
-            for (int x = 0; x < image.Width; x++)
+            for (int x = 0; x < charImage.Width; x++)
             {
-                int r = _random.Next(0, 256);
-                int g = _random.Next(0, 256);
-                int b = _random.Next(0, 256);
+                Color pixel = charImage.GetPixel(x, y);
+                totalSum += (pixel.R + pixel.G + pixel.B) / 3;
+            }
+        }
 
-                image.SetPixel(x, y, Color.FromArgb(r, g, b));
+        return totalSum / (size.Height * size.Width);
+    }
+
+    private Bitmap DrawText(string text, Color textColor, Color backColor, SizeF size)
+    {
+        Bitmap img = new Bitmap((int)size.Width, (int)size.Height);
+        using Graphics drawing = Graphics.FromImage(img);
+        drawing.Clear(backColor);
+
+        using Brush textBrush = new SolidBrush(textColor);
+        SizeF textSize = drawing.MeasureString(text, Constants.Font);
+        drawing.DrawString(text, Constants.Font, textBrush, (size.Width - textSize.Width) / 2, 0);
+
+        return img;
+    }
+
+    public Bitmap ResizeImage(Bitmap original, SizeF characterSize)
+    {
+        int newWidth = (int)(original.Width / characterSize.Width);
+        int newHeight = (int)(original.Height / characterSize.Height);
+
+        if (newWidth <= 0 || newHeight <= 0)
+        {
+            return original;
+        }
+
+        Bitmap resizedImage = new Bitmap(newWidth, newHeight);
+        using Graphics graphics = Graphics.FromImage(resizedImage);
+
+        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        graphics.DrawImage(original, new Rectangle(0, 0, newWidth, newHeight));
+
+        return resizedImage;
+    }
+
+    public string GenerateAsciiArt(Bitmap image)
+    {
+        SizeF charSize = GetCharacterSize();
+        Bitmap resizedImage = ResizeImage(image, charSize);
+        StringBuilder asciiArt = new();
+
+        for (int y = 0; y < resizedImage.Height; y++)
+        {
+            for (int x = 0; x < resizedImage.Width; x++)
+            {
+                Color pixelColor = resizedImage.GetPixel(x, y);
+                int grayScale = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
+                int yield = grayScale * (_weightedChars.Count - 1);
+
+                string asciiChar = _weightedChars[yield / 255].Character;
+                asciiArt.Append(asciiChar);
+            }
+            asciiArt.AppendLine();
+        }
+
+        return asciiArt.ToString();
+    }
+
+    public Bitmap GenerateBitmap(string asciiArt, SizeF charSize)
+    {
+        string[] lines = asciiArt.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        int width = lines.Max(line => line.Length);
+        int height = lines.Length;
+
+        int imageWidth = (int)(width * charSize.Width);
+        int imageHeight = (int)(height * charSize.Height);
+
+        Bitmap image = new Bitmap(imageWidth, imageHeight);
+        using Graphics graphics = Graphics.FromImage(image);
+
+        graphics.Clear(Color.White);
+        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+        using SolidBrush brush = new(Color.Black);
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < lines[y].Length; x++)
+            {
+                graphics.DrawString(lines[y][x].ToString(), Constants.Font, brush, x * charSize.Width, y * charSize.Height);
             }
         }
 

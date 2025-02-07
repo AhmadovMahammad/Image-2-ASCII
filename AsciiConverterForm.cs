@@ -1,27 +1,48 @@
+using System.Drawing.Imaging;
+
 namespace Image2ASCII
 {
+    // todo: allow users to increase/decrease the number of characters.
+    // todo: allow users to increase/decrease density.
+
+    // Constructor & Initialization
     public partial class AsciiConverterForm : Form
     {
-        private readonly ImagePreprocessor _imagePreprocessor;
-        private readonly Dictionary<int, Bitmap> _contrastDictionary = new();
-        private readonly Dictionary<int, Bitmap> _grayScaleDictionary = new();
+        private readonly ImagePreprocessor _imagePreprocessor = new ImagePreprocessor();
+        private readonly FilterAdjustment _filterAdjustment = new FilterAdjustment();
+        private readonly Dictionary<FilterKey, Bitmap> _filterDictionary = [];
+
+        private Bitmap? _originalImage;
         private Bitmap? _image;
 
-        // todo: when image is loaded and if there are already changed filters, we should apply them to the image
-        // todo: add new filters and group them in a panel
-        // todo: add a button to save the image as PNG
-        // todo: add strategy pattern to add different kind of grayscale filters
-
+        // Constructor & Initialization
         public AsciiConverterForm()
         {
             InitializeComponent();
-            _imagePreprocessor = new ImagePreprocessor();
-
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            this.SetStyle(ControlStyles.UserPaint, true);
+            InitializeUI();
         }
 
+        private void InitializeUI()
+        {
+            Font = new Font(_fontFamily, 8.25F);
+            outputTextBox.Font = new Font(_fontFamily, 6.0F);
+            pictureBox.Controls.Add(imagePreviewLabel);
+            outputTextBox.SelectionAlignment = HorizontalAlignment.Center;
+            ActiveControl = pictureBox;
+
+            contrastTrackBar.ValueChanged += TrackBar_ValueChanged;
+            grayScaleTrackBar.ValueChanged += TrackBar_ValueChanged;
+            brightnessTrackBar.ValueChanged += TrackBar_ValueChanged;
+            invertTrackBar.ValueChanged += TrackBar_ValueChanged;
+            sepiaTrackBar.ValueChanged += TrackBar_ValueChanged;
+
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.UserPaint, true);
+        }
+
+
+        // Image Loading & Processing
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using OpenFileDialog openFileDialog = new();
@@ -33,25 +54,44 @@ namespace Image2ASCII
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                _image = new Bitmap(openFileDialog.FileName);
+                _originalImage = new Bitmap(openFileDialog.FileName);
+                _image = (Bitmap)_originalImage.Clone();
+
                 if (pictureBox != null)
                 {
                     pictureBox.Image = _image;
+                    HidePreviewLabelVisibility();
                 }
             }
         }
 
-        private void brightnessTrackBar_Scroll(object sender, EventArgs e)
+        private FilterKey GetFilterKey()
         {
-            int contrastValue = settingTrackBar_1.Value;
-            settingValueLabel_1.Text = $"{contrastValue}%";
+            int contrastValue = contrastTrackBar.Value;
+            int grayScaleValue = grayScaleTrackBar.Value;
+            int brightnessValue = brightnessTrackBar.Value;
+            int invertValue = invertTrackBar.Value;
+            int sepiaValue = sepiaTrackBar.Value;
 
+            return new FilterKey(contrastValue, grayScaleValue, brightnessValue, invertValue, sepiaValue);
+        }
+
+
+        // Filter Adjustments(TrackBar Events)
+        private void adjustContrastTrackBar_Scroll(object sender, EventArgs e)
+        {
+            if (_originalImage == null)
+            {
+                contrastTrackBar.Value = 0;
+            }
+
+            FilterKey filterKey = GetFilterKey();
             if (_image != null)
             {
-                if (!_contrastDictionary.TryGetValue(contrastValue, out Bitmap? value))
+                if (!_filterDictionary.TryGetValue(filterKey, out Bitmap? value))
                 {
-                    value = _imagePreprocessor.AdjustContrast(_image, contrastValue);
-                    _contrastDictionary.Add(contrastValue, value);
+                    value = _filterAdjustment.AdjustContrast((Bitmap)_image.Clone(), filterKey.ContrastValue);
+                    _filterDictionary.Add(filterKey, value);
                 }
 
                 _image = value;
@@ -59,28 +99,206 @@ namespace Image2ASCII
             }
         }
 
-        private void grayScaleTrackBar_Scroll(object sender, EventArgs e)
+        private void adjustGrayScaleTrackBar_Scroll(object sender, EventArgs e)
         {
-            int grayScaleValue = settingTrackBar_2.Value;
-            settingValueLabel_2.Text = $"{grayScaleValue}%";
+            if (_originalImage == null)
+            {
+                grayScaleTrackBar.Value = 0;
+            }
 
+            FilterKey filterKey = GetFilterKey();
             if (_image != null)
             {
-                _image = _imagePreprocessor.GrayScale(_image);
+                if (!_filterDictionary.TryGetValue(filterKey, out Bitmap? value))
+                {
+                    value = _filterAdjustment.AdjustGrayScale((Bitmap)_image.Clone(), filterKey.GrayScaleValue);
+                    _filterDictionary.Add(filterKey, value);
+                }
+
+                _image = value;
                 pictureBox.Image = _image;
+            }
+        }
+
+        private void adjustBrightnessTrackbar_Scroll(object sender, EventArgs e)
+        {
+            if (_originalImage == null)
+            {
+                brightnessTrackBar.Value = 0;
+            }
+
+            FilterKey filterKey = GetFilterKey();
+            if (_image != null)
+            {
+                if (!_filterDictionary.TryGetValue(filterKey, out Bitmap? value))
+                {
+                    value = _filterAdjustment.AdjustBrightness((Bitmap)_image.Clone(), filterKey.BrightnessValue);
+                    _filterDictionary.Add(filterKey, value);
+                }
+
+                _image = value;
+                pictureBox.Image = _image;
+            }
+        }
+
+        private void adjustInvertTrackbar_Scroll(object sender, EventArgs e)
+        {
+            if (_originalImage == null)
+            {
+                invertTrackBar.Value = 0;
+            }
+
+            FilterKey filterKey = GetFilterKey();
+            if (_image != null)
+            {
+                if (!_filterDictionary.TryGetValue(filterKey, out Bitmap? value))
+                {
+                    value = _filterAdjustment.AdjustInvert((Bitmap)_image.Clone(), invertTrackBar.Value);
+                    _filterDictionary.Add(filterKey, value);
+                }
+
+                _image = value;
+                pictureBox.Image = _image;
+            }
+        }
+
+        private void adjustSepiaTrackbar_Scroll(object sender, EventArgs e)
+        {
+            if (_originalImage == null)
+            {
+                sepiaTrackBar.Value = 0;
+            }
+
+            FilterKey filterKey = GetFilterKey();
+            if (_image != null)
+            {
+
+            }
+        }
+
+        private void TrackBar_ValueChanged(object? sender, EventArgs e)
+        {
+            if (sender is TrackBar trackBar)
+            {
+                Label? label = trackBar.Name switch
+                {
+                    nameof(contrastTrackBar) => contrastValueLabel,
+                    nameof(grayScaleTrackBar) => grayScaleValueLabel,
+                    nameof(brightnessTrackBar) => brightnessValueLabel,
+                    nameof(invertTrackBar) => invertValueLabel,
+                    nameof(sepiaTrackBar) => sepiaValueLabel,
+                    _ => null
+                };
+
+                if (label == null) return;
+                label.Text = $"{trackBar.Value}%";
+
+                if (_image != null)
+                {
+                    outputTextBox.Text = _imagePreprocessor.GenerateAsciiArt(_image);
+                }
+            }
+        }
+
+
+        // ASCII Art Processing
+        private void HidePreviewLabelVisibility()
+        {
+            if (_image != null)
+            {
+                imagePreviewLabel.Visible = false;
             }
         }
 
         private void resetButton_Click(object sender, EventArgs e)
         {
-            settingTrackBar_1.Value = 0;
-            settingTrackBar_2.Value = 0;
-            
-            settingValueLabel_1.Text = "0%";
-            settingValueLabel_2.Text = "0%";
+            contrastTrackBar.Value = 0;
+            grayScaleTrackBar.Value = 0;
+            brightnessTrackBar.Value = 0;
+            invertTrackBar.Value = 0;
+            sepiaTrackBar.Value = 0;
+            outputTextBox.Text = string.Empty;
 
-            _image = null;
-            pictureBox.Image = null;
+            if (_originalImage != null)
+            {
+                _image = (Bitmap)_originalImage.Clone();
+                pictureBox.Image = _image;
+            }
+        }
+
+
+        // Copy & Save Functionality
+        private async void copyButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(outputTextBox.Text)) return;
+
+            Clipboard.SetText(outputTextBox.Text);
+            copyButton.Text = "Copied";
+            copyButton.Enabled = false;
+
+            await Task.Delay(3000);
+
+            copyButton.Text = "Copy to Clipboard";
+            copyButton.Enabled = true;
+        }
+
+        private void SaveAsButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(outputTextBox.Text)) return;
+            Bitmap bitmap = _imagePreprocessor.GenerateBitmap(outputTextBox.Text, _imagePreprocessor.CommonSize);
+
+            using SaveFileDialog saveFileDialog = new()
+            {
+                Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp|TXT File|*.txt",
+                Title = "Save Ascii Art Image",
+                FileName = "AsciiArt.png"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string extension = Path.GetExtension(saveFileDialog.FileName).ToLower();
+                    if (extension == ".txt")
+                    {
+                        saveAsText(saveFileDialog.FileName);
+                    }
+                    else
+                    {
+                        ImageFormat format = ImageFormat.Png;
+
+                        format = extension switch
+                        {
+                            ".jpg" => ImageFormat.Jpeg,
+                            ".jpeg" => ImageFormat.Jpeg,
+                            ".bmp" => ImageFormat.Bmp,
+                            _ => ImageFormat.Png
+                        };
+
+                        bitmap.Save(saveFileDialog.FileName, format);
+                        MessageBox.Show("Image saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error saving image: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void saveAsText(string fileName)
+        {
+            using FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+            using TextWriter writer = new StreamWriter(fileStream);
+
+            writer.Write(outputTextBox.Text);
+        }
+
+
+        // Exit application
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

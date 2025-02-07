@@ -5,7 +5,7 @@ namespace Image2ASCII
     partial class AsciiConverterForm
     {
         private System.ComponentModel.IContainer components = null;
-        private readonly (int width, int height) _size = (1200, 700);
+        private readonly string _fontFamily = "FiraCode Nerd Font Mono Med";
 
         protected override void Dispose(bool disposing)
         {
@@ -28,18 +28,27 @@ namespace Image2ASCII
             mainPanel = new Panel();
             imagePanel = new Panel();
             pictureBox = new PictureBox();
+            imagePreviewLabel = new Label();
             uploadButton = new Button();
             settingsPanel = new Panel();
-            settingLabel_1 = new Label();
-            settingTrackBar_1 = new TrackBar();
-            settingValueLabel_1 = new Label();
-            settingLabel_2 = new Label();
-            settingTrackBar_2 = new TrackBar();
-            settingValueLabel_2 = new Label();
+            contrastLabel = new Label();
+            contrastTrackBar = new TrackBar();
+            contrastValueLabel = new Label();
+            grayScaleLabel = new Label();
+            grayScaleTrackBar = new TrackBar();
+            grayScaleValueLabel = new Label();
+            brightnessLabel = new Label();
+            brightnessTrackBar = new TrackBar();
+            brightnessValueLabel = new Label();
+            invertLabel = new Label();
+            invertTrackBar = new TrackBar();
+            invertValueLabel = new Label();
+            sepiaLabel = new Label();
+            sepiaTrackBar = new TrackBar();
+            sepiaValueLabel = new Label();
             buttonPanel = new Panel();
             copyButton = new Button();
-            saveAsciiArtButton = new Button();
-            saveAsPngButton = new Button();
+            saveAsButton = new Button();
             resetButton = new Button();
             outputPanel = new Panel();
             outputTextBox = new RichTextBox();
@@ -48,43 +57,47 @@ namespace Image2ASCII
             imagePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             settingsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)settingTrackBar_1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)settingTrackBar_2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)contrastTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)grayScaleTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)brightnessTrackBar).BeginInit();
             buttonPanel.SuspendLayout();
             outputPanel.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip
             // 
+            menuStrip.ImageScalingSize = new Size(20, 20);
             menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu });
             menuStrip.Location = new Point(5, 0);
             menuStrip.Name = "menuStrip";
-            menuStrip.Size = new Size(1195, 24);
+            menuStrip.Size = new Size(1195, 28);
             menuStrip.TabIndex = 0;
             // 
             // fileMenu
             // 
             fileMenu.DropDownItems.AddRange(new ToolStripItem[] { openMenuItem, separator, exitMenuItem });
             fileMenu.Name = "fileMenu";
-            fileMenu.Size = new Size(37, 20);
+            fileMenu.Size = new Size(46, 24);
             fileMenu.Text = "&File";
             // 
             // openMenuItem
             // 
             openMenuItem.Name = "openMenuItem";
-            openMenuItem.Size = new Size(115, 22);
-            openMenuItem.Text = "&Open ...";
+            openMenuItem.Size = new Size(200, 26);
+            openMenuItem.Text = "&Upload Image ...";
+            openMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // separator
             // 
             separator.Name = "separator";
-            separator.Size = new Size(112, 6);
+            separator.Size = new Size(197, 6);
             // 
             // exitMenuItem
             // 
             exitMenuItem.Name = "exitMenuItem";
-            exitMenuItem.Size = new Size(115, 22);
-            exitMenuItem.Text = "E&xit";
+            exitMenuItem.Size = new Size(200, 26);
+            exitMenuItem.Text = "&Exit...";
+            exitMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // mainPanel
             // 
@@ -101,6 +114,7 @@ namespace Image2ASCII
             // imagePanel
             // 
             imagePanel.Controls.Add(pictureBox);
+            imagePanel.Controls.Add(imagePreviewLabel);
             imagePanel.Controls.Add(uploadButton);
             imagePanel.Location = new Point(10, 40);
             imagePanel.Name = "imagePanel";
@@ -114,93 +128,204 @@ namespace Image2ASCII
             pictureBox.Name = "pictureBox";
             pictureBox.Size = new Size(300, 250);
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox.TabIndex = 0;
+            pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
+            // 
+            // imagePreviewLabel
+            // 
+            imagePreviewLabel.BackColor = Color.Transparent;
+            imagePreviewLabel.Location = new Point(3, 3);
+            imagePreviewLabel.Name = "imagePreviewLabel";
+            imagePreviewLabel.Size = new Size(300, 250);
+            imagePreviewLabel.TabIndex = 0;
+            imagePreviewLabel.Text = "NO IMAGE";
+            imagePreviewLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // uploadButton
             // 
             uploadButton.Location = new Point(3, 263);
             uploadButton.Name = "uploadButton";
             uploadButton.Size = new Size(300, 30);
-            uploadButton.TabIndex = 1;
+            uploadButton.TabIndex = 0;
+            uploadButton.FlatStyle = FlatStyle.Flat;
             uploadButton.Text = "Upload Image";
             uploadButton.Click += openToolStripMenuItem_Click;
             // 
             // settingsPanel
             // 
-            settingsPanel.Controls.Add(settingLabel_1);
-            settingsPanel.Controls.Add(settingTrackBar_1);
-            settingsPanel.Controls.Add(settingValueLabel_1);
-            settingsPanel.Controls.Add(settingLabel_2);
-            settingsPanel.Controls.Add(settingTrackBar_2);
-            settingsPanel.Controls.Add(settingValueLabel_2);
+            settingsPanel.Controls.Add(contrastLabel);
+            settingsPanel.Controls.Add(contrastTrackBar);
+            settingsPanel.Controls.Add(contrastValueLabel);
+            settingsPanel.Controls.Add(grayScaleLabel);
+            settingsPanel.Controls.Add(grayScaleTrackBar);
+            settingsPanel.Controls.Add(grayScaleValueLabel);
+            settingsPanel.Controls.Add(brightnessLabel);
+            settingsPanel.Controls.Add(brightnessTrackBar);
+            settingsPanel.Controls.Add(brightnessValueLabel);
+            settingsPanel.Controls.Add(invertLabel);
+            settingsPanel.Controls.Add(invertTrackBar);
+            settingsPanel.Controls.Add(invertValueLabel);
+            settingsPanel.Controls.Add(sepiaLabel);
+            settingsPanel.Controls.Add(sepiaTrackBar);
+            settingsPanel.Controls.Add(sepiaValueLabel);
             settingsPanel.Location = new Point(370, 40);
             settingsPanel.Name = "settingsPanel";
             settingsPanel.Size = new Size(800, 300);
             settingsPanel.TabIndex = 1;
             // 
-            // settingLabel_1
+            // contrastLabel
             // 
-            settingLabel_1.Location = new Point(20, 20);
-            settingLabel_1.Name = "settingLabel_1";
-            settingLabel_1.Size = new Size(120, 30);
-            settingLabel_1.TabIndex = 0;
-            settingLabel_1.Text = "Contrast:";
-            settingLabel_1.TextAlign = ContentAlignment.MiddleLeft;
+            contrastLabel.Location = new Point(20, 3);
+            contrastLabel.Name = "contrastLabel";
+            contrastLabel.Size = new Size(120, 30);
+            contrastLabel.TabIndex = 0;
+            contrastLabel.Text = "Contrast:";
+            contrastLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // settingTrackBar_1
+            // contrastTrackBar
             // 
-            settingTrackBar_1.Location = new Point(150, 20);
-            settingTrackBar_1.Maximum = 100;
-            settingTrackBar_1.Minimum = -100;
-            settingTrackBar_1.Name = "settingTrackBar_1";
-            settingTrackBar_1.Size = new Size(500, 45);
-            settingTrackBar_1.TabIndex = 1;
-            settingTrackBar_1.TickFrequency = 5;
-            settingTrackBar_1.TickStyle = TickStyle.TopLeft;
-            settingTrackBar_1.Scroll += brightnessTrackBar_Scroll;
+            contrastTrackBar.Location = new Point(150, 3);
+            contrastTrackBar.Maximum = 100;
+            contrastTrackBar.Minimum = -100;
+            contrastTrackBar.Name = "contrastTrackBar";
+            contrastTrackBar.Size = new Size(500, 56);
+            contrastTrackBar.TabIndex = 1;
+            contrastTrackBar.TickFrequency = 8;
+            contrastTrackBar.TickStyle = TickStyle.TopLeft;
+            contrastTrackBar.Scroll += adjustContrastTrackBar_Scroll;
             // 
-            // settingValueLabel_1
+            // contrastValueLabel
             // 
-            settingValueLabel_1.Location = new Point(670, 20);
-            settingValueLabel_1.Name = "settingValueLabel_1";
-            settingValueLabel_1.Size = new Size(120, 30);
-            settingValueLabel_1.TabIndex = 2;
-            settingValueLabel_1.TextAlign = ContentAlignment.MiddleLeft;
+            contrastValueLabel.Location = new Point(670, 3);
+            contrastValueLabel.Name = "contrastValueLabel";
+            contrastValueLabel.Size = new Size(120, 30);
+            contrastValueLabel.TabIndex = 2;
+            contrastValueLabel.Text = "0%";
+            contrastValueLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // settingLabel_2
+            // grayScaleLabel
             // 
-            settingLabel_2.Location = new Point(20, 60);
-            settingLabel_2.Name = "settingLabel_2";
-            settingLabel_2.Size = new Size(120, 30);
-            settingLabel_2.TabIndex = 0;
-            settingLabel_2.Text = "Gray Scale:";
-            settingLabel_2.TextAlign = ContentAlignment.MiddleLeft;
+            grayScaleLabel.Location = new Point(20, 63);
+            grayScaleLabel.Name = "grayScaleLabel";
+            grayScaleLabel.Size = new Size(120, 30);
+            grayScaleLabel.TabIndex = 0;
+            grayScaleLabel.Text = "Gray Scale:";
+            grayScaleLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // settingTrackBar_2
+            // grayScaleTrackBar
             // 
-            settingTrackBar_2.Location = new Point(150, 60);
-            settingTrackBar_2.Maximum = 100;
-            settingTrackBar_2.Name = "settingTrackBar_2";
-            settingTrackBar_2.Size = new Size(500, 45);
-            settingTrackBar_2.TabIndex = 1;
-            settingTrackBar_2.TickFrequency = 5;
-            settingTrackBar_2.TickStyle = TickStyle.TopLeft;
-            settingTrackBar_2.Scroll += grayScaleTrackBar_Scroll;
+            grayScaleTrackBar.Location = new Point(150, 63);
+            grayScaleTrackBar.Maximum = 100;
+            grayScaleTrackBar.Name = "grayScaleTrackBar";
+            grayScaleTrackBar.Size = new Size(500, 56);
+            grayScaleTrackBar.TabIndex = 1;
+            grayScaleTrackBar.TickFrequency = 4;
+            grayScaleTrackBar.TickStyle = TickStyle.TopLeft;
+            grayScaleTrackBar.Scroll += adjustGrayScaleTrackBar_Scroll;
             // 
-            // settingValueLabel_2
+            // grayScaleValueLabel
             // 
-            settingValueLabel_2.Location = new Point(670, 60);
-            settingValueLabel_2.Name = "settingValueLabel_2";
-            settingValueLabel_2.Size = new Size(120, 30);
-            settingValueLabel_2.TabIndex = 2;
-            settingValueLabel_2.TextAlign = ContentAlignment.MiddleLeft;
+            grayScaleValueLabel.Location = new Point(670, 63);
+            grayScaleValueLabel.Name = "grayScaleValueLabel";
+            grayScaleValueLabel.Size = new Size(120, 30);
+            grayScaleValueLabel.TabIndex = 2;
+            grayScaleValueLabel.Text = "0%";
+            grayScaleValueLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // brightnessLabel
+            // 
+            brightnessLabel.Location = new Point(20, 123);
+            brightnessLabel.Name = "brightnessLabel";
+            brightnessLabel.Size = new Size(120, 30);
+            brightnessLabel.TabIndex = 0;
+            brightnessLabel.Text = "Brightness:";
+            brightnessLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // brightnessTrackBar
+            // 
+            brightnessTrackBar.Location = new Point(150, 123);
+            brightnessTrackBar.Minimum = -100;
+            brightnessTrackBar.Maximum = 100;
+            brightnessTrackBar.Name = "brightnessTrackBar";
+            brightnessTrackBar.Size = new Size(500, 56);
+            brightnessTrackBar.TabIndex = 1;
+            brightnessTrackBar.TickFrequency = 8;
+            brightnessTrackBar.TickStyle = TickStyle.TopLeft;
+            brightnessTrackBar.Scroll += adjustBrightnessTrackbar_Scroll;
+            // 
+            // brightnessValueLabel
+            // 
+            brightnessValueLabel.Location = new Point(670, 123);
+            brightnessValueLabel.Name = "brightnessValueLabel";
+            brightnessValueLabel.Size = new Size(120, 30);
+            brightnessValueLabel.TabIndex = 2;
+            brightnessValueLabel.Text = "0%";
+            brightnessValueLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // invertLabel
+            // 
+            invertLabel.Location = new Point(20, 183);
+            invertLabel.Name = "invertLabel";
+            invertLabel.Size = new Size(120, 30);
+            invertLabel.TabIndex = 0;
+            invertLabel.Text = "Invert:";
+            invertLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // invertTrackBar
+            // 
+            invertTrackBar.Location = new Point(150, 183);
+            invertTrackBar.Minimum = 0;
+            invertTrackBar.Maximum = 100;
+            invertTrackBar.Name = "invertTrackBar";
+            invertTrackBar.Size = new Size(500, 56);
+            invertTrackBar.TabIndex = 1;
+            invertTrackBar.TickFrequency = 4;
+            invertTrackBar.TickStyle = TickStyle.TopLeft;
+            invertTrackBar.Scroll += adjustInvertTrackbar_Scroll;
+            // 
+            // invertValueLabel
+            // 
+            invertValueLabel.Location = new Point(670, 183);
+            invertValueLabel.Name = "invertValueLabel";
+            invertValueLabel.Size = new Size(120, 30);
+            invertValueLabel.TabIndex = 2;
+            invertValueLabel.Text = "0%";
+            invertValueLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // sepiaLabel
+            // 
+            sepiaLabel.Location = new Point(20, 243);
+            sepiaLabel.Name = "sepiaLabel";
+            sepiaLabel.Size = new Size(120, 30);
+            sepiaLabel.TabIndex = 0;
+            sepiaLabel.Text = "Sepia:";
+            sepiaLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // sepiaTrackBar
+            // 
+            sepiaTrackBar.Location = new Point(150, 243);
+            sepiaTrackBar.Minimum = 0;
+            sepiaTrackBar.Maximum = 100;
+            sepiaTrackBar.Name = "sepiaTrackBar";
+            sepiaTrackBar.Size = new Size(500, 56);
+            sepiaTrackBar.TabIndex = 1;
+            sepiaTrackBar.TickFrequency = 4;
+            sepiaTrackBar.TickStyle = TickStyle.TopLeft;
+            sepiaTrackBar.Scroll += adjustSepiaTrackbar_Scroll;
+            // 
+            // sepiaValueLabel
+            // 
+            sepiaValueLabel.Location = new Point(670, 243);
+            sepiaValueLabel.Name = "sepiaValueLabel";
+            sepiaValueLabel.Size = new Size(120, 30);
+            sepiaValueLabel.TabIndex = 2;
+            sepiaValueLabel.Text = "0%";
+            sepiaValueLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // buttonPanel
             // 
             buttonPanel.Controls.Add(copyButton);
-            buttonPanel.Controls.Add(saveAsciiArtButton);
-            buttonPanel.Controls.Add(saveAsPngButton);
+            buttonPanel.Controls.Add(saveAsButton);
             buttonPanel.Controls.Add(resetButton);
             buttonPanel.Location = new Point(10, 360);
             buttonPanel.Name = "buttonPanel";
@@ -209,31 +334,28 @@ namespace Image2ASCII
             // 
             // copyButton
             // 
+            copyButton.FlatStyle = FlatStyle.Flat;
             copyButton.Location = new Point(0, 10);
             copyButton.Name = "copyButton";
             copyButton.Size = new Size(200, 30);
             copyButton.TabIndex = 0;
             copyButton.Text = "Copy to Clipboard";
+            copyButton.Click += copyButton_Click;
             // 
-            // saveAsciiArtButton
+            // saveAsButton
             // 
-            saveAsciiArtButton.Location = new Point(210, 10);
-            saveAsciiArtButton.Name = "saveAsciiArtButton";
-            saveAsciiArtButton.Size = new Size(200, 30);
-            saveAsciiArtButton.TabIndex = 1;
-            saveAsciiArtButton.Text = "Save ASCII Art";
-            // 
-            // saveAsPngButton
-            // 
-            saveAsPngButton.Location = new Point(420, 10);
-            saveAsPngButton.Name = "saveAsPngButton";
-            saveAsPngButton.Size = new Size(200, 30);
-            saveAsPngButton.TabIndex = 1;
-            saveAsPngButton.Text = "Save as PNG";
+            saveAsButton.FlatStyle = FlatStyle.Flat;
+            saveAsButton.Location = new Point(210, 10);
+            saveAsButton.Name = "saveAsPngButton";
+            saveAsButton.Size = new Size(200, 30);
+            saveAsButton.TabIndex = 1;
+            saveAsButton.Text = "Save as ...";
+            saveAsButton.Click += SaveAsButton_Click;
             // 
             // resetButton
             // 
-            resetButton.Location = new Point(630, 10);
+            resetButton.FlatStyle = FlatStyle.Flat;
+            resetButton.Location = new Point(420, 10);
             resetButton.Name = "resetButton";
             resetButton.Size = new Size(200, 30);
             resetButton.TabIndex = 2;
@@ -250,7 +372,7 @@ namespace Image2ASCII
             // 
             // outputTextBox
             // 
-            outputTextBox.Dock = DockStyle.Fill;
+            outputTextBox.Anchor = AnchorStyles.None;
             outputTextBox.Location = new Point(0, 0);
             outputTextBox.Name = "outputTextBox";
             outputTextBox.ReadOnly = true;
@@ -264,7 +386,6 @@ namespace Image2ASCII
             ClientSize = new Size(1200, 700);
             Controls.Add(menuStrip);
             Controls.Add(mainPanel);
-            Font = new Font("FiraCode Nerd Font Mono Med", 8.25F);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "AsciiConverterForm";
@@ -278,8 +399,9 @@ namespace Image2ASCII
             ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
             settingsPanel.ResumeLayout(false);
             settingsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)settingTrackBar_1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)settingTrackBar_2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)contrastTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)grayScaleTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)brightnessTrackBar).EndInit();
             buttonPanel.ResumeLayout(false);
             outputPanel.ResumeLayout(false);
             ResumeLayout(false);
@@ -293,25 +415,45 @@ namespace Image2ASCII
         private ToolStripMenuItem openMenuItem;
         private ToolStripSeparator separator;
         private ToolStripMenuItem exitMenuItem;
+
+        // main
         private Panel mainPanel;
+
+        // image panel
         private Panel imagePanel;
         private PictureBox pictureBox;
         private Button uploadButton;
+        private Label imagePreviewLabel;
+
+        // settings panel
         private Panel settingsPanel;
 
-        private Label settingLabel_1;
-        private TrackBar settingTrackBar_1;
-        private Label settingValueLabel_1;
+        private Label contrastLabel;
+        private TrackBar contrastTrackBar;
+        private Label contrastValueLabel;
 
-        private Label settingLabel_2;
-        private TrackBar settingTrackBar_2;
-        private Label settingValueLabel_2;
+        private Label grayScaleLabel;
+        private TrackBar grayScaleTrackBar;
+        private Label grayScaleValueLabel;
 
+        private Label brightnessLabel;
+        private TrackBar brightnessTrackBar;
+        private Label brightnessValueLabel;
+
+        private Label invertLabel;
+        private TrackBar invertTrackBar;
+        private Label invertValueLabel;
+
+        private Label sepiaLabel;
+        private TrackBar sepiaTrackBar;
+        private Label sepiaValueLabel;
+
+        // buttons panel
         private Panel buttonPanel;
         private Button copyButton;
-        private Button saveAsciiArtButton;
-        private Button saveAsPngButton;
+        private Button saveAsButton;
         private Button resetButton;
+
         private Panel outputPanel;
         private RichTextBox outputTextBox;
     }
