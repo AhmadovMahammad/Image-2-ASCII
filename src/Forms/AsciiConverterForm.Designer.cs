@@ -30,6 +30,7 @@ namespace Image2ASCII
             pictureBox = new PictureBox();
             imagePreviewLabel = new Label();
             uploadPanel = new Panel();
+            uploadLabel = new Label();
             settingsPanel = new Panel();
             contrastLabel = new Label();
             contrastTrackBar = new TrackBar();
@@ -52,11 +53,11 @@ namespace Image2ASCII
             resetButton = new Button();
             outputPanel = new Panel();
             outputTextBox = new RichTextBox();
-            uploadLabel = new Label();
             menuStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             imagePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
+            uploadPanel.SuspendLayout();
             settingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)contrastTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)grayScaleTrackBar).BeginInit();
@@ -147,16 +148,29 @@ namespace Image2ASCII
             // 
             // uploadPanel
             // 
+            uploadPanel.AllowDrop = true;
             uploadPanel.BackColor = Color.Transparent;
             uploadPanel.BorderStyle = BorderStyle.FixedSingle;
+            uploadPanel.Controls.Add(uploadLabel);
             uploadPanel.Cursor = Cursors.Hand;
             uploadPanel.Location = new Point(3, 263);
             uploadPanel.Name = "uploadPanel";
             uploadPanel.Size = new Size(300, 80);
             uploadPanel.TabIndex = 0;
-            uploadPanel.AllowDrop = true;
-            uploadPanel.DragEnter += uploadPanel_DragEnter;
             uploadPanel.DragDrop += uploadPanel_DragDrop;
+            uploadPanel.DragEnter += uploadPanel_DragEnter;
+            // 
+            // uploadLabel
+            // 
+            uploadLabel.BackColor = Color.Transparent;
+            uploadLabel.ForeColor = Color.Black;
+            uploadLabel.Location = new Point(10, 10);
+            uploadLabel.Name = "uploadLabel";
+            uploadLabel.Size = new Size(280, 60);
+            uploadLabel.TabIndex = 0;
+            uploadLabel.Text = "Upload a file by dragging and dropping it here, or click here to select file";
+            uploadLabel.TextAlign = ContentAlignment.TopCenter;
+            uploadLabel.Click += openToolStripMenuItem_Click;
             // 
             // settingsPanel
             // 
@@ -385,17 +399,6 @@ namespace Image2ASCII
             outputTextBox.TabIndex = 0;
             outputTextBox.Text = "";
             // 
-            // uploadLabel
-            // 
-            uploadLabel.BackColor = Color.Transparent;
-            uploadLabel.ForeColor = Color.Black;
-            uploadLabel.Location = new Point(10, 10);
-            uploadLabel.Name = "uploadLabel";
-            uploadLabel.Size = new Size(280, 60);
-            uploadLabel.TabIndex = 0;
-            uploadLabel.Text = "Upload a file by dragging and dropping it here, or click here to select file";
-            uploadLabel.TextAlign = ContentAlignment.TopCenter;
-            // 
             // AsciiConverterForm
             // 
             AutoScroll = true;
@@ -413,6 +416,7 @@ namespace Image2ASCII
             mainPanel.ResumeLayout(false);
             imagePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
+            uploadPanel.ResumeLayout(false);
             settingsPanel.ResumeLayout(false);
             settingsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)contrastTrackBar).EndInit();

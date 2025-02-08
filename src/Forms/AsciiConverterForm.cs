@@ -14,6 +14,7 @@ namespace Image2ASCII
         private readonly ImagePreprocessor _imagePreprocessor = new();
         private readonly FilterAdjustment _filterAdjustment = new();
         private readonly Dictionary<FilterKey, Bitmap> _filterDictionary = [];
+        private readonly List<TrackBar> _trackBars = [];
 
         private Bitmap? _outputImage;
         private Bitmap? _originalImage;
@@ -29,22 +30,19 @@ namespace Image2ASCII
 
         private void InitializeUI()
         {
-            Font = new Font(_fontFamily, 8.25F);
-            outputTextBox.Font = new Font(_fontFamily, 8.0F);
-            outputTextBox.SelectionAlignment = HorizontalAlignment.Center;
-            ActiveControl = pictureBox;
+            _trackBars.AddRange([contrastTrackBar, grayScaleTrackBar, brightnessTrackBar, invertTrackBar, sepiaTrackBar]);
 
-            // control related
+            Font = new Font(_fontFamily, 8.25F);
+            outputTextBox.SelectionAlignment = HorizontalAlignment.Center;
             pictureBox.Controls.Add(imagePreviewLabel);
-            uploadPanel.Controls.Add(uploadLabel);
-            uploadLabel.Click += openToolStripMenuItem_Click;
 
             // events
-            contrastTrackBar.ValueChanged += TrackBar_ValueChanged;
-            grayScaleTrackBar.ValueChanged += TrackBar_ValueChanged;
-            brightnessTrackBar.ValueChanged += TrackBar_ValueChanged;
-            invertTrackBar.ValueChanged += TrackBar_ValueChanged;
-            sepiaTrackBar.ValueChanged += TrackBar_ValueChanged;
+            resetButton.Enabled = _trackBars.Any(tb => tb.Value != 0);
+            _trackBars.ForEach(tb => tb.ValueChanged += (sender, e) =>
+            {
+                TrackBar_ValueChanged(sender, e);
+                resetButton.Enabled = _trackBars.Any(tb => tb.Value != 0);
+            });
 
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -53,8 +51,6 @@ namespace Image2ASCII
 
         private void InitializeBindings()
         {
-            List<TrackBar> trackBars = [contrastTrackBar, grayScaleTrackBar, brightnessTrackBar, invertTrackBar, sepiaTrackBar];
-
             new List<Button>() { copyButton, saveAsButton }.ForEach(button =>
             {
                 Binding binding = new Binding("Enabled", outputTextBox, "Text");
@@ -65,16 +61,6 @@ namespace Image2ASCII
 
                 button.DataBindings.Add(binding);
             });
-
-            trackBars.ForEach(trackbar =>
-            {
-                trackbar.ValueChanged += (sender, e) =>
-                {
-                    resetButton.Enabled = trackBars.Any(tb => tb.Value != 0);
-                };
-            });
-
-            resetButton.Enabled = trackBars.Any(tb => tb.Value != 0);
         }
 
 
