@@ -1,4 +1,4 @@
-namespace Image2ASCII
+namespace Image2ASCII.src
 {
     internal static class Program
     {

@@ -1,3 +1,5 @@
+using Image2ASCII.src.Core;
+using Image2ASCII.src.Core.Models;
 using System.Drawing.Imaging;
 
 namespace Image2ASCII
@@ -12,6 +14,7 @@ namespace Image2ASCII
         private readonly FilterAdjustment _filterAdjustment = new FilterAdjustment();
         private readonly Dictionary<FilterKey, Bitmap> _filterDictionary = [];
 
+        private Bitmap? _outputImage;
         private Bitmap? _originalImage;
         private Bitmap? _image;
 
@@ -195,7 +198,8 @@ namespace Image2ASCII
 
                 if (_image != null)
                 {
-                    outputTextBox.Text = _imagePreprocessor.GenerateAsciiArt(_image);
+                    _outputImage = _imagePreprocessor.GenerateAsciiArt(_image, out string output);
+                    outputTextBox.Text = output;
                 }
             }
         }
@@ -245,7 +249,6 @@ namespace Image2ASCII
         private void SaveAsButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(outputTextBox.Text)) return;
-            Bitmap bitmap = _imagePreprocessor.GenerateBitmap(outputTextBox.Text, _imagePreprocessor.CommonSize);
 
             using SaveFileDialog saveFileDialog = new()
             {
@@ -275,7 +278,7 @@ namespace Image2ASCII
                             _ => ImageFormat.Png
                         };
 
-                        bitmap.Save(saveFileDialog.FileName, format);
+                        _outputImage?.Save(saveFileDialog.FileName, format);
                         MessageBox.Show("Image saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }

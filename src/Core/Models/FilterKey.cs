@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Image2ASCII;
+﻿namespace Image2ASCII.src.Core.Models;
 public readonly struct FilterKey
 {
     public int ContrastValue { get; }

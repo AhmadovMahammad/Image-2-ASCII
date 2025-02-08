@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Imaging;
 
-namespace Image2ASCII;
+namespace Image2ASCII.src.Core;
 public class FilterAdjustment
 {
     public Bitmap AdjustGrayScale(Bitmap original, float ratio)
@@ -31,7 +31,7 @@ public class FilterAdjustment
 
             Parallel.For(0, height, y =>
             {
-                byte* row = ptr + (y * stride);
+                byte* row = ptr + y * stride;
                 for (int x = 0; x < width; x++)
                 {
                     int columnOffset = x * 4;
@@ -46,9 +46,9 @@ public class FilterAdjustment
                     int grayValue = (int)(R * 0.299 + G * 0.587 + B * 0.114);
 
                     // formula: New Color = (Original Color × (1 − α)) + Grayscale Color × α
-                    row[columnOffset] = (byte)((B * (1 - ratio)) + (grayValue * ratio));
-                    row[columnOffset + 1] = (byte)((G * (1 - ratio)) + (grayValue * ratio)); ;
-                    row[columnOffset + 2] = (byte)((R * (1 - ratio)) + (grayValue * ratio)); ;
+                    row[columnOffset] = (byte)(B * (1 - ratio) + grayValue * ratio);
+                    row[columnOffset + 1] = (byte)(G * (1 - ratio) + grayValue * ratio); ;
+                    row[columnOffset + 2] = (byte)(R * (1 - ratio) + grayValue * ratio); ;
                 }
             });
         }
@@ -76,7 +76,7 @@ public class FilterAdjustment
 
             Parallel.For(0, height, y =>
             {
-                byte* row = ptr + (y * stride);
+                byte* row = ptr + y * stride;
                 for (int x = 0; x < width; x++)
                 {
                     int columnOffset = x * 4;
@@ -89,9 +89,9 @@ public class FilterAdjustment
                     float green = G / 255.0f;
                     float blue = B / 255.0f;
 
-                    red = (((red - 0.5f) * ratio) + 0.5f) * 255.0f;
-                    green = (((green - 0.5f) * ratio) + 0.5f) * 255.0f;
-                    blue = (((blue - 0.5f) * ratio) + 0.5f) * 255.0f;
+                    red = ((red - 0.5f) * ratio + 0.5f) * 255.0f;
+                    green = ((green - 0.5f) * ratio + 0.5f) * 255.0f;
+                    blue = ((blue - 0.5f) * ratio + 0.5f) * 255.0f;
 
                     row[columnOffset] = (byte)Math.Clamp(blue, 0, 255);
                     row[columnOffset + 1] = (byte)Math.Clamp(green, 0, 255);
@@ -123,7 +123,7 @@ public class FilterAdjustment
 
             Parallel.For(0, height, y =>
             {
-                byte* row = ptr + (y * stride);
+                byte* row = ptr + y * stride;
                 for (int x = 0; x < width; x++)
                 {
                     int columnOffset = x * 4;
@@ -168,7 +168,7 @@ public class FilterAdjustment
 
             Parallel.For(0, height, y =>
             {
-                byte* row = ptr + (y * stride);
+                byte* row = ptr + y * stride;
                 for (int x = 0; x < width; x++)
                 {
                     int columnOffset = x * 4;
@@ -181,9 +181,9 @@ public class FilterAdjustment
                     byte invG = (byte)(255 - G);
                     byte invR = (byte)(255 - R);
 
-                    row[columnOffset] = (byte)((B * (1 - ratio)) + (invB * ratio));
-                    row[columnOffset + 1] = (byte)((G * (1 - ratio)) + (invG * ratio));
-                    row[columnOffset + 2] = (byte)((R * (1 - ratio)) + (invR * ratio));
+                    row[columnOffset] = (byte)(B * (1 - ratio) + invB * ratio);
+                    row[columnOffset + 1] = (byte)(G * (1 - ratio) + invG * ratio);
+                    row[columnOffset + 2] = (byte)(R * (1 - ratio) + invR * ratio);
                 }
             });
         }

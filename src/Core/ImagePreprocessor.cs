@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using Image2ASCII.src.Core.Models;
+using System.Drawing;
+using System.Text;
 
-namespace Image2ASCII;
+namespace Image2ASCII.src.Core;
 public partial class ImagePreprocessor
 {
     private readonly List<WeightedChar> _weightedChars;
@@ -119,11 +121,21 @@ public partial class ImagePreprocessor
         return resizedImage;
     }
 
-    public string GenerateAsciiArt(Bitmap image)
+    public Bitmap GenerateAsciiArt(Bitmap original, out string output)
     {
         SizeF charSize = GetCharacterSize();
-        Bitmap resizedImage = ResizeImage(image, charSize);
+        Bitmap resizedImage = ResizeImage(original, charSize);
         StringBuilder asciiArt = new();
+
+        int imageWidth = (int)(resizedImage.Width * charSize.Width);
+        int imageHeight = (int)(resizedImage.Height * charSize.Height);
+
+        Bitmap image = new Bitmap(imageWidth, imageHeight);
+        using Graphics graphics = Graphics.FromImage(image);
+
+        graphics.Clear(Color.White);
+        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        using SolidBrush solidBrush = new SolidBrush(Color.Black);
 
         for (int y = 0; y < resizedImage.Height; y++)
         {
@@ -132,40 +144,16 @@ public partial class ImagePreprocessor
                 Color pixelColor = resizedImage.GetPixel(x, y);
                 int grayScale = (int)(pixelColor.R * 0.299 + pixelColor.G * 0.587 + pixelColor.B * 0.114);
                 int yield = grayScale * (_weightedChars.Count - 1);
-
                 string asciiChar = _weightedChars[yield / 255].Character;
+
+                graphics.DrawString(asciiChar, Constants.Font, solidBrush, x * charSize.Width, y * charSize.Height);
                 asciiArt.Append(asciiChar);
             }
+
             asciiArt.AppendLine();
         }
 
-        return asciiArt.ToString();
-    }
-
-    public Bitmap GenerateBitmap(string asciiArt, SizeF charSize)
-    {
-        string[] lines = asciiArt.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        int width = lines.Max(line => line.Length);
-        int height = lines.Length;
-
-        int imageWidth = (int)(width * charSize.Width);
-        int imageHeight = (int)(height * charSize.Height);
-
-        Bitmap image = new Bitmap(imageWidth, imageHeight);
-        using Graphics graphics = Graphics.FromImage(image);
-
-        graphics.Clear(Color.White);
-        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-
-        using SolidBrush brush = new(Color.Black);
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < lines[y].Length; x++)
-            {
-                graphics.DrawString(lines[y][x].ToString(), Constants.Font, brush, x * charSize.Width, y * charSize.Height);
-            }
-        }
-
+        output = asciiArt.ToString();
         return image;
     }
 }
