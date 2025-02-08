@@ -29,7 +29,7 @@ namespace Image2ASCII
             imagePanel = new Panel();
             pictureBox = new PictureBox();
             imagePreviewLabel = new Label();
-            uploadButton = new Button();
+            uploadPanel = new Panel();
             settingsPanel = new Panel();
             contrastLabel = new Label();
             contrastTrackBar = new TrackBar();
@@ -52,6 +52,7 @@ namespace Image2ASCII
             resetButton = new Button();
             outputPanel = new Panel();
             outputTextBox = new RichTextBox();
+            uploadLabel = new Label();
             menuStrip.SuspendLayout();
             mainPanel.SuspendLayout();
             imagePanel.SuspendLayout();
@@ -60,6 +61,8 @@ namespace Image2ASCII
             ((System.ComponentModel.ISupportInitialize)contrastTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)grayScaleTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)brightnessTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)invertTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)sepiaTrackBar).BeginInit();
             buttonPanel.SuspendLayout();
             outputPanel.SuspendLayout();
             SuspendLayout();
@@ -108,17 +111,17 @@ namespace Image2ASCII
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(5, 0);
             mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(1195, 700);
+            mainPanel.Size = new Size(1195, 800);
             mainPanel.TabIndex = 1;
             // 
             // imagePanel
             // 
             imagePanel.Controls.Add(pictureBox);
             imagePanel.Controls.Add(imagePreviewLabel);
-            imagePanel.Controls.Add(uploadButton);
+            imagePanel.Controls.Add(uploadPanel);
             imagePanel.Location = new Point(10, 40);
             imagePanel.Name = "imagePanel";
-            imagePanel.Size = new Size(350, 300);
+            imagePanel.Size = new Size(350, 350);
             imagePanel.TabIndex = 0;
             // 
             // pictureBox
@@ -133,23 +136,27 @@ namespace Image2ASCII
             // 
             // imagePreviewLabel
             // 
+            imagePreviewLabel.AllowDrop = true;
             imagePreviewLabel.BackColor = Color.Transparent;
             imagePreviewLabel.Location = new Point(3, 3);
             imagePreviewLabel.Name = "imagePreviewLabel";
             imagePreviewLabel.Size = new Size(300, 250);
             imagePreviewLabel.TabIndex = 0;
-            imagePreviewLabel.Text = "NO IMAGE";
+            imagePreviewLabel.Text = "No image";
             imagePreviewLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // uploadButton
+            // uploadPanel
             // 
-            uploadButton.Location = new Point(3, 263);
-            uploadButton.Name = "uploadButton";
-            uploadButton.Size = new Size(300, 30);
-            uploadButton.TabIndex = 0;
-            uploadButton.FlatStyle = FlatStyle.Flat;
-            uploadButton.Text = "Upload Image";
-            uploadButton.Click += openToolStripMenuItem_Click;
+            uploadPanel.BackColor = Color.Transparent;
+            uploadPanel.BorderStyle = BorderStyle.FixedSingle;
+            uploadPanel.Cursor = Cursors.Hand;
+            uploadPanel.Location = new Point(3, 263);
+            uploadPanel.Name = "uploadPanel";
+            uploadPanel.Size = new Size(300, 80);
+            uploadPanel.TabIndex = 0;
+            uploadPanel.AllowDrop = true;
+            uploadPanel.DragEnter += uploadPanel_DragEnter;
+            uploadPanel.DragDrop += uploadPanel_DragDrop;
             // 
             // settingsPanel
             // 
@@ -244,8 +251,8 @@ namespace Image2ASCII
             // brightnessTrackBar
             // 
             brightnessTrackBar.Location = new Point(150, 123);
-            brightnessTrackBar.Minimum = -100;
             brightnessTrackBar.Maximum = 100;
+            brightnessTrackBar.Minimum = -100;
             brightnessTrackBar.Name = "brightnessTrackBar";
             brightnessTrackBar.Size = new Size(500, 56);
             brightnessTrackBar.TabIndex = 1;
@@ -274,7 +281,6 @@ namespace Image2ASCII
             // invertTrackBar
             // 
             invertTrackBar.Location = new Point(150, 183);
-            invertTrackBar.Minimum = 0;
             invertTrackBar.Maximum = 100;
             invertTrackBar.Name = "invertTrackBar";
             invertTrackBar.Size = new Size(500, 56);
@@ -304,7 +310,6 @@ namespace Image2ASCII
             // sepiaTrackBar
             // 
             sepiaTrackBar.Location = new Point(150, 243);
-            sepiaTrackBar.Minimum = 0;
             sepiaTrackBar.Maximum = 100;
             sepiaTrackBar.Name = "sepiaTrackBar";
             sepiaTrackBar.Size = new Size(500, 56);
@@ -327,7 +332,7 @@ namespace Image2ASCII
             buttonPanel.Controls.Add(copyButton);
             buttonPanel.Controls.Add(saveAsButton);
             buttonPanel.Controls.Add(resetButton);
-            buttonPanel.Location = new Point(10, 360);
+            buttonPanel.Location = new Point(10, 410);
             buttonPanel.Name = "buttonPanel";
             buttonPanel.Size = new Size(1160, 50);
             buttonPanel.TabIndex = 2;
@@ -346,7 +351,7 @@ namespace Image2ASCII
             // 
             saveAsButton.FlatStyle = FlatStyle.Flat;
             saveAsButton.Location = new Point(210, 10);
-            saveAsButton.Name = "saveAsPngButton";
+            saveAsButton.Name = "saveAsButton";
             saveAsButton.Size = new Size(200, 30);
             saveAsButton.TabIndex = 1;
             saveAsButton.Text = "Save as ...";
@@ -365,9 +370,9 @@ namespace Image2ASCII
             // outputPanel
             // 
             outputPanel.Controls.Add(outputTextBox);
-            outputPanel.Location = new Point(10, 420);
+            outputPanel.Location = new Point(10, 470);
             outputPanel.Name = "outputPanel";
-            outputPanel.Size = new Size(1160, 250);
+            outputPanel.Size = new Size(1160, 300);
             outputPanel.TabIndex = 3;
             // 
             // outputTextBox
@@ -376,14 +381,25 @@ namespace Image2ASCII
             outputTextBox.Location = new Point(0, 0);
             outputTextBox.Name = "outputTextBox";
             outputTextBox.ReadOnly = true;
-            outputTextBox.Size = new Size(1160, 250);
+            outputTextBox.Size = new Size(1160, 300);
             outputTextBox.TabIndex = 0;
             outputTextBox.Text = "";
+            // 
+            // uploadLabel
+            // 
+            uploadLabel.BackColor = Color.Transparent;
+            uploadLabel.ForeColor = Color.Black;
+            uploadLabel.Location = new Point(10, 10);
+            uploadLabel.Name = "uploadLabel";
+            uploadLabel.Size = new Size(280, 60);
+            uploadLabel.TabIndex = 0;
+            uploadLabel.Text = "Upload a file by dragging and dropping it here, or click here to select file";
+            uploadLabel.TextAlign = ContentAlignment.TopCenter;
             // 
             // AsciiConverterForm
             // 
             AutoScroll = true;
-            ClientSize = new Size(1200, 700);
+            ClientSize = new Size(1200, 800);
             Controls.Add(menuStrip);
             Controls.Add(mainPanel);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -402,6 +418,8 @@ namespace Image2ASCII
             ((System.ComponentModel.ISupportInitialize)contrastTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)grayScaleTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)brightnessTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)invertTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)sepiaTrackBar).EndInit();
             buttonPanel.ResumeLayout(false);
             outputPanel.ResumeLayout(false);
             ResumeLayout(false);
@@ -422,7 +440,8 @@ namespace Image2ASCII
         // image panel
         private Panel imagePanel;
         private PictureBox pictureBox;
-        private Button uploadButton;
+        private Panel uploadPanel;
+        private Label uploadLabel;
         private Label imagePreviewLabel;
 
         // settings panel

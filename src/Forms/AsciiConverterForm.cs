@@ -1,5 +1,6 @@
 using Image2ASCII.src.Core;
 using Image2ASCII.src.Core.Models;
+using Image2ASCII.src.Helpers.Validators;
 using System.Drawing.Imaging;
 
 namespace Image2ASCII
@@ -10,8 +11,8 @@ namespace Image2ASCII
     // Constructor & Initialization
     public partial class AsciiConverterForm : Form
     {
-        private readonly ImagePreprocessor _imagePreprocessor = new ImagePreprocessor();
-        private readonly FilterAdjustment _filterAdjustment = new FilterAdjustment();
+        private readonly ImagePreprocessor _imagePreprocessor = new();
+        private readonly FilterAdjustment _filterAdjustment = new();
         private readonly Dictionary<FilterKey, Bitmap> _filterDictionary = [];
 
         private Bitmap? _outputImage;
@@ -29,11 +30,16 @@ namespace Image2ASCII
         private void InitializeUI()
         {
             Font = new Font(_fontFamily, 8.25F);
-            outputTextBox.Font = new Font(_fontFamily, 6.0F);
-            pictureBox.Controls.Add(imagePreviewLabel);
+            outputTextBox.Font = new Font(_fontFamily, 8.0F);
             outputTextBox.SelectionAlignment = HorizontalAlignment.Center;
             ActiveControl = pictureBox;
 
+            // control related
+            pictureBox.Controls.Add(imagePreviewLabel);
+            uploadPanel.Controls.Add(uploadLabel);
+            uploadLabel.Click += openToolStripMenuItem_Click;
+
+            // events
             contrastTrackBar.ValueChanged += TrackBar_ValueChanged;
             grayScaleTrackBar.ValueChanged += TrackBar_ValueChanged;
             brightnessTrackBar.ValueChanged += TrackBar_ValueChanged;
@@ -72,7 +78,7 @@ namespace Image2ASCII
         }
 
         // Image Loading & Processing
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openToolStripMenuItem_Click(object? sender, EventArgs e)
         {
             using OpenFileDialog openFileDialog = new();
             openFileDialog.InitialDirectory = "c:\\";
@@ -83,30 +89,51 @@ namespace Image2ASCII
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                _originalImage = new Bitmap(openFileDialog.FileName);
-                _image = (Bitmap)_originalImage.Clone();
-
-                if (pictureBox != null)
-                {
-                    pictureBox.Image = _image;
-                    pictureBox.Tag = DateTime.Now;
-                    //pictureBox.DataBindings["Image"]?.ReadValue();
-                    HidePreviewLabelVisibility();
-                }
+                LoadImage(openFileDialog.FileName);
             }
         }
 
-        private FilterKey GetFilterKey()
+        private void uploadPanel_DragEnter(object sender, DragEventArgs e)
         {
-            int contrastValue = contrastTrackBar.Value;
-            int grayScaleValue = grayScaleTrackBar.Value;
-            int brightnessValue = brightnessTrackBar.Value;
-            int invertValue = invertTrackBar.Value;
-            int sepiaValue = sepiaTrackBar.Value;
-
-            return new FilterKey(contrastValue, grayScaleValue, brightnessValue, invertValue, sepiaValue);
+            if (e.Data is IDataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[]? files = (string[]?)dataObject.GetData(DataFormats.FileDrop);
+                if (files != null)
+                {
+                    e.Effect = files.Length switch
+                    {
+                        int count when count == 1 && files[0].IsImage() => DragDropEffects.Copy,
+                        _ => DragDropEffects.None
+                    };
+                }
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
         }
 
+        private void uploadPanel_DragDrop(object sender, DragEventArgs e)
+        {
+            string[]? files = (string[]?)e.Data!.GetData(DataFormats.FileDrop);
+            if (files != null)
+            {
+                LoadImage(files[0]);
+            }
+        }
+
+        private void LoadImage(string fileName)
+        {
+            _originalImage = new Bitmap(fileName);
+            _image = (Bitmap)_originalImage.Clone();
+
+            if (pictureBox != null)
+            {
+                pictureBox.Image = _image;
+                pictureBox.Tag = DateTime.Now;
+                HidePreviewLabelVisibility();
+            }
+        }
 
         // Filter Adjustments(TrackBar Events)
         private void adjustContrastTrackBar_Scroll(object sender, EventArgs e)
@@ -205,6 +232,17 @@ namespace Image2ASCII
             {
 
             }
+        }
+
+        private FilterKey GetFilterKey()
+        {
+            int contrastValue = contrastTrackBar.Value;
+            int grayScaleValue = grayScaleTrackBar.Value;
+            int brightnessValue = brightnessTrackBar.Value;
+            int invertValue = invertTrackBar.Value;
+            int sepiaValue = sepiaTrackBar.Value;
+
+            return new FilterKey(contrastValue, grayScaleValue, brightnessValue, invertValue, sepiaValue);
         }
 
         private void TrackBar_ValueChanged(object? sender, EventArgs e)
