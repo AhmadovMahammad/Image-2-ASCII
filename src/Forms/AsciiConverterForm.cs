@@ -23,6 +23,7 @@ namespace Image2ASCII
         {
             InitializeComponent();
             InitializeUI();
+            InitializeBindings();
         }
 
         private void InitializeUI()
@@ -44,6 +45,31 @@ namespace Image2ASCII
             SetStyle(ControlStyles.UserPaint, true);
         }
 
+        private void InitializeBindings()
+        {
+            List<TrackBar> trackBars = [contrastTrackBar, grayScaleTrackBar, brightnessTrackBar, invertTrackBar, sepiaTrackBar];
+
+            new List<Button>() { copyButton, saveAsButton }.ForEach(button =>
+            {
+                Binding binding = new Binding("Enabled", outputTextBox, "Text");
+                binding.Format += (sender, e) =>
+                {
+                    e.Value = !string.IsNullOrEmpty(outputTextBox.Text);
+                };
+
+                button.DataBindings.Add(binding);
+            });
+
+            trackBars.ForEach(trackbar =>
+            {
+                trackbar.ValueChanged += (sender, e) =>
+                {
+                    resetButton.Enabled = trackBars.Any(tb => tb.Value != 0);
+                };
+            });
+
+            resetButton.Enabled = trackBars.Any(tb => tb.Value != 0);
+        }
 
         // Image Loading & Processing
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -63,6 +89,8 @@ namespace Image2ASCII
                 if (pictureBox != null)
                 {
                     pictureBox.Image = _image;
+                    pictureBox.Tag = DateTime.Now;
+                    //pictureBox.DataBindings["Image"]?.ReadValue();
                     HidePreviewLabelVisibility();
                 }
             }
