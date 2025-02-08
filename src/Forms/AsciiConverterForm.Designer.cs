@@ -199,7 +199,7 @@ namespace Image2ASCII
             contrastTrackBar.TabIndex = 1;
             contrastTrackBar.TickFrequency = 8;
             contrastTrackBar.TickStyle = TickStyle.TopLeft;
-            contrastTrackBar.Scroll += adjustContrastTrackBar_Scroll;
+            contrastTrackBar.Scroll += TrackBar_ValueChanged;
             // 
             // contrastValueLabel
             // 
@@ -228,7 +228,7 @@ namespace Image2ASCII
             grayScaleTrackBar.TabIndex = 1;
             grayScaleTrackBar.TickFrequency = 4;
             grayScaleTrackBar.TickStyle = TickStyle.TopLeft;
-            grayScaleTrackBar.Scroll += adjustGrayScaleTrackBar_Scroll;
+            grayScaleTrackBar.Scroll += TrackBar_ValueChanged;
             // 
             // grayScaleValueLabel
             // 
@@ -258,7 +258,7 @@ namespace Image2ASCII
             brightnessTrackBar.TabIndex = 1;
             brightnessTrackBar.TickFrequency = 8;
             brightnessTrackBar.TickStyle = TickStyle.TopLeft;
-            brightnessTrackBar.Scroll += adjustBrightnessTrackbar_Scroll;
+            brightnessTrackBar.Scroll += TrackBar_ValueChanged;
             // 
             // brightnessValueLabel
             // 
@@ -287,7 +287,7 @@ namespace Image2ASCII
             invertTrackBar.TabIndex = 1;
             invertTrackBar.TickFrequency = 4;
             invertTrackBar.TickStyle = TickStyle.TopLeft;
-            invertTrackBar.Scroll += adjustInvertTrackbar_Scroll;
+            invertTrackBar.Scroll += TrackBar_ValueChanged;
             // 
             // invertValueLabel
             // 
@@ -316,7 +316,7 @@ namespace Image2ASCII
             sepiaTrackBar.TabIndex = 1;
             sepiaTrackBar.TickFrequency = 4;
             sepiaTrackBar.TickStyle = TickStyle.TopLeft;
-            sepiaTrackBar.Scroll += adjustSepiaTrackbar_Scroll;
+            sepiaTrackBar.Scroll += TrackBar_ValueChanged;
             // 
             // sepiaValueLabel
             // 
