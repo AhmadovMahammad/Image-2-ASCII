@@ -28,6 +28,7 @@ namespace Image2ASCII
             mainPanel = new Panel();
             imagePanel = new Panel();
             pictureBox = new PictureBox();
+            saveImageButton = new Button();
             imagePreviewLabel = new Label();
             uploadPanel = new Panel();
             uploadLabel = new Label();
@@ -118,7 +119,6 @@ namespace Image2ASCII
             // imagePanel
             // 
             imagePanel.Controls.Add(pictureBox);
-            imagePanel.Controls.Add(imagePreviewLabel);
             imagePanel.Controls.Add(uploadPanel);
             imagePanel.Location = new Point(10, 40);
             imagePanel.Name = "imagePanel";
@@ -130,15 +130,26 @@ namespace Image2ASCII
             pictureBox.BorderStyle = BorderStyle.FixedSingle;
             pictureBox.Location = new Point(3, 3);
             pictureBox.Name = "pictureBox";
+            pictureBox.BackColor = Color.Transparent;
             pictureBox.Size = new Size(300, 250);
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
+            //
+            // saveImageButton
+            //
+            saveImageButton.Text = "Save Image";
+            saveImageButton.TabIndex = 0;
+            saveImageButton.Location = new Point(pictureBox.Width - saveImageButton.Width - 3, pictureBox.Height - saveImageButton.Height - 3);
+            saveImageButton.BackColor = Color.Transparent;
+            saveImageButton.Margin = new Padding(3);
+            saveImageButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            saveImageButton.FlatStyle = FlatStyle.Popup;
+            saveImageButton.Click += saveFiltered_Click;
             // 
             // imagePreviewLabel
             // 
             imagePreviewLabel.AllowDrop = true;
-            imagePreviewLabel.BackColor = Color.Transparent;
             imagePreviewLabel.Location = new Point(3, 3);
             imagePreviewLabel.Name = "imagePreviewLabel";
             imagePreviewLabel.Size = new Size(300, 250);
@@ -164,12 +175,12 @@ namespace Image2ASCII
             // 
             uploadLabel.BackColor = Color.Transparent;
             uploadLabel.ForeColor = Color.Black;
-            uploadLabel.Location = new Point(10, 10);
+            uploadLabel.Location = new Point(10, 0);
             uploadLabel.Name = "uploadLabel";
-            uploadLabel.Size = new Size(280, 60);
+            uploadLabel.Size = new Size(280, 80);
             uploadLabel.TabIndex = 0;
             uploadLabel.Text = "Upload a file by dragging and dropping it here, or click here to select file";
-            uploadLabel.TextAlign = ContentAlignment.TopCenter;
+            uploadLabel.TextAlign = ContentAlignment.MiddleCenter;
             uploadLabel.Click += openToolStripMenuItem_Click;
             // 
             // settingsPanel
@@ -369,7 +380,7 @@ namespace Image2ASCII
             saveAsButton.Size = new Size(200, 30);
             saveAsButton.TabIndex = 1;
             saveAsButton.Text = "Save as ...";
-            saveAsButton.Click += SaveAsButton_Click;
+            saveAsButton.Click += saveAsButton_Click;
             // 
             // resetButton
             // 
@@ -444,6 +455,7 @@ namespace Image2ASCII
         // image panel
         private Panel imagePanel;
         private PictureBox pictureBox;
+        private Button saveImageButton;
         private Panel uploadPanel;
         private Label uploadLabel;
         private Label imagePreviewLabel;

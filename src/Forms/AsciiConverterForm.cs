@@ -35,6 +35,7 @@ namespace Image2ASCII
             Font = new Font(_fontFamily, 8.25F);
             outputTextBox.SelectionAlignment = HorizontalAlignment.Center;
             pictureBox.Controls.Add(imagePreviewLabel);
+            pictureBox.Controls.Add(saveImageButton);
 
             // events
             resetButton.Enabled = _trackBars.Any(tb => tb.Value != 0);
@@ -202,15 +203,37 @@ namespace Image2ASCII
             copyButton.Enabled = true;
         }
 
-        private void SaveAsButton_Click(object sender, EventArgs e)
+        private void saveFiltered_Click(object sender, EventArgs e)
+        {
+            if (_image != null)
+            {
+                SaveImage(
+                    _image,
+                    "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp",
+                    "FilteredArt.png");
+            }
+        }
+
+        private void saveAsButton_Click(object sender, EventArgs e)
+        {
+            if (_outputImage != null)
+            {
+                SaveImage(
+                    _outputImage,
+                    "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp|TXT File|*.txt",
+                    "AsciiArt.png");
+            }
+        }
+
+        private void SaveImage(Bitmap bitmap, string filter, string? identifier = null)
         {
             if (string.IsNullOrWhiteSpace(outputTextBox.Text)) return;
 
             using SaveFileDialog saveFileDialog = new()
             {
-                Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp|TXT File|*.txt",
+                Filter = filter,
                 Title = "Save Ascii Art Image",
-                FileName = "AsciiArt.png"
+                FileName = identifier ?? "AsciiArt.png"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -235,7 +258,7 @@ namespace Image2ASCII
                             _ => ImageFormat.Png
                         };
 
-                        _outputImage?.Save(saveFileDialog.FileName, format);
+                        bitmap.Save(saveFileDialog.FileName, format);
                         MessageBox.Show("Image saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
