@@ -117,8 +117,11 @@ namespace Image2ASCII
 
             if (pictureBox != null)
             {
+                // If the second image is uploaded and any filters are found in the previous dictionary, the previous image will be returned, which was a bug.
+                _filterDictionary.Clear();
+
                 pictureBox.Image = _image;
-                imagePreviewLabel.Visible = false;
+                if (!imagePreviewLabel.Visible) imagePreviewLabel.Visible = false;
 
                 _outputImage = _imagePreprocessor.GenerateAsciiArt(_image, out string output);
                 outputTextBox.Text = output;

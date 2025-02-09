@@ -10,15 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\download.ico" />
-	  <None Remove="Resources\downloadIcon.png" />
 	  <None Remove="seedData.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Resources\downloadIcon.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>
