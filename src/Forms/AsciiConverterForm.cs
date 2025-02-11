@@ -121,7 +121,7 @@ namespace Image2ASCII
                 _filterDictionary.Clear();
 
                 pictureBox.Image = _image;
-                if (!imagePreviewLabel.Visible) imagePreviewLabel.Visible = false;
+                if (imagePreviewLabel.Visible) imagePreviewLabel.Visible = false;
 
                 _outputImage = _imagePreprocessor.GenerateAsciiArt(_image, out string output);
                 outputTextBox.Text = output;
